@@ -1,0 +1,94 @@
+# RAG Pipeline Configuration
+rag:
+  # Retrieval configuration
+  retrieval:
+    # Number of documents to retrieve
+    k: 4
+    # Hybrid search weights
+    keyword_weight: 0.3
+    semantic_weight: 0.7
+    # Minimum relevance score threshold
+    score_threshold: 0.3
+
+  # Re-ranking
+  reranking:
+    enabled: true
+    top_k: 2
+
+  # Prompt templates
+  prompt:
+    # System prompt
+    system_prompt: |
+      You are an expert assistant for Apple Battery Manufacturing domain.
+      Your role is to provide accurate, technical information about battery
+      manufacturing processes, quality control, and safety procedures.
+
+      Guidelines:
+      - Use only the provided context to answer questions
+      - If you don't know the answer, say so clearly
+      - Provide detailed technical explanations when appropriate
+      - Include relevant process parameters and specifications
+      - Reference specific documents when possible
+
+    # User prompt template
+    user_prompt_template: |
+      Context information:
+      {context}
+
+      Question: {question}
+
+      Answer the question based on the provided context.
+      If the context doesn't contain enough information to answer the question,
+      state that clearly and provide what information you can.
+
+      Answer:
+
+    # Few-shot examples
+    few_shot_examples:
+      - question: "What is the typical voltage range for Li-ion batteries?"
+        answer: "Lithium-ion batteries typically operate at 3.6V to 4.2V per cell nominal voltage."
+
+      - question: "What quality tests are performed on battery cells?"
+        answer: "Quality tests include capacity testing, impedance testing, visual inspection, and safety testing."
+
+  # Response generation
+  generation:
+    # Set use_local: true to use local TinyLlama + LoRA model
+    use_local: false
+    # Path to LoRA adapter (only used if use_local: true)
+    lora_adapter_path: models/lora_adapter
+    # Base model for local generation
+    base_model: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+    temperature: 0.7
+    max_tokens: 1024
+    top_p: 0.9
+    # MiniMax API key (only used if use_local: false)
+    minimax_api_key: ${MINIMAX_API_KEY}
+
+  # Hallucination mitigation
+  hallucination_check:
+    enabled: true
+    consistency_threshold: 0.8
+    self_check_frequency: 3
+
+  # Citation and grounding
+  citation:
+    enabled: true
+    source_format: "[Source: {source}]"
+    include_page_numbers: true
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 1
+  reload: true
+
+# Monitoring
+monitoring:
+  langsmith:
+    enabled: false
+    project_name: "battery-llm"
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

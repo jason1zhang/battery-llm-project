@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  battery-llm-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: battery-llm-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../configs:/app/configs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATA_PATH=/app/data/raw
+      - PERSIST_DIR=/app/data/embeddings/chroma
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # Optional: ChromaDB service (if using remote)
+  # chromadb:
+  #   image: chromadb/chroma:latest
+  #   container_name: battery-chromadb
+  #   ports:
+  #     - "8001:8000"
+  #   volumes:
+  #     - chroma_data:/chroma/chroma
+  #   restart: unless-stopped
+
+  # Optional: MLflow for model versioning
+  # mlflow:
+  #   image: ghcr.io/mlflow/mlflow:v2.12.0
+  #   container_name: battery-mlflow
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - mlflow_data:/mlflow
+  #   environment:
+  #     - MLFLOW_BACKEND_STORE=sqlite:///mlflow/mlflow.db
+  #   restart: unless-stopped
+
+volumes:
+  # chroma_data:
+  # mlflow_data:
+  # - Just use bind mounts for local development
+  data:
+  logs:
+  configs:
+
+networks:
+  default:
+    name: battery-llm-network
