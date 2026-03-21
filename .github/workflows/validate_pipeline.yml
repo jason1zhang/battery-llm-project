@@ -1,0 +1,61 @@
+name: Validate Pipeline
+
+on:
+  push:
+    paths:
+      - 'data/raw/**'
+      - 'src/rag/**'
+      - 'src/data_pipeline/**'
+
+jobs:
+  validate-rag:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Validate RAG pipeline
+      run: |
+        python -c "
+import sys
+sys.path.insert(0, '.')
+from src.rag.pipeline import RAGPipeline
+
+# Test that pipeline can be created
+print('Testing RAG pipeline creation...')
+pipeline = RAGPipeline()
+
+print('Pipeline created successfully!')
+print('Config:', pipeline.config.get('rag', {}).get('retrieval', {}))
+print('Model:', pipeline.config.get('model', {}).get('generator_model', {}).get('name'))
+"
+
+  check-documents:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check document changes
+      run: |
+        # Show what documents changed
+        echo "=== Documents in data/raw ==="
+        find data/raw -name "*.md" -type f | head -20
+
+        echo ""
+        echo "=== Document count ==="
+        find data/raw -name "*.md" -type f | wc -l
+
+        echo ""
+        echo "=== Sample document (first 500 chars) ==="
+        find data/raw -name "*.md" -type f -exec head -20 {} \; | head -50
