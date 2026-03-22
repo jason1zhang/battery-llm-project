@@ -1,12 +1,25 @@
 """
 Benchmark tests for RAG system evaluation.
 These tests evaluate the quality of RAG answers using sample questions.
+
+Note: These tests require the vector store to be built locally.
+They will skip in CI if data/embeddings/chroma doesn't exist.
 """
 
+import os
 import pytest
 from typing import List
 
 from src.rag.pipeline import RAGPipeline
+
+
+# Check if vector store exists (locally only)
+VECTOR_STORE_PATH = "data/embeddings/chroma"
+HAS_VECTOR_STORE = os.path.exists(VECTOR_STORE_PATH) and any(
+    f.endswith(('.sqlite3', '.parquet'))
+    for f in os.listdir(VECTOR_STORE_PATH)
+    if os.path.isfile(os.path.join(VECTOR_STORE_PATH, f))
+)
 
 
 # Benchmark questions for battery manufacturing domain
@@ -39,6 +52,11 @@ BENCHMARK_QUESTIONS = [
 ]
 
 
+# Skip all tests in this class if vector store not available
+@pytest.mark.skipif(
+    not HAS_VECTOR_STORE,
+    reason="Vector store not available (data/embeddings/chroma not in git)"
+)
 class TestRAGPipeline:
     """Test RAG pipeline with benchmark questions."""
 
@@ -142,6 +160,10 @@ class TestRAGPipeline:
             pytest.fail(f"Empty question caused error: {e}")
 
 
+@pytest.mark.skipif(
+    not HAS_VECTOR_STORE,
+    reason="Vector store not available (data/embeddings/chroma not in git)"
+)
 class TestRAGBenchmark:
     """Benchmark tests that evaluate RAG quality."""
 
@@ -217,6 +239,10 @@ class TestRAGBenchmark:
         print(f"\nResponse time: {response_time:.2f}s")
 
 
+@pytest.mark.skipif(
+    not HAS_VECTOR_STORE,
+    reason="Vector store not available (data/embeddings/chroma not in git)"
+)
 class TestRAGQuality:
     """High-level quality tests for RAG system."""
 
