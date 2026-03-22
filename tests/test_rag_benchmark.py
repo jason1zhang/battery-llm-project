@@ -49,7 +49,7 @@ class TestRAGPipeline:
     def pipeline(self):
         """Create RAG pipeline for testing."""
         pipeline = RAGPipeline()
-        # Note: This will load existing vector store if available
+        pipeline.initialize(persist_directory="data/embeddings/chroma")
         return pipeline
 
     def test_pipeline_responds_to_question(self, pipeline):
@@ -151,7 +151,9 @@ class TestRAGBenchmark:
     @pytest.fixture
     def pipeline(self):
         """Create RAG pipeline for testing."""
-        return RAGPipeline()
+        pipeline = RAGPipeline()
+        pipeline.initialize(persist_directory="data/embeddings/chroma")
+        return pipeline
 
     @pytest.mark.parametrize("benchmark", BENCHMARK_QUESTIONS)
     def test_benchmark_question(self, pipeline, benchmark):
@@ -226,6 +228,7 @@ class TestRAGQuality:
     def test_no_error_on_common_questions(self):
         """Test that system handles common questions without errors."""
         pipeline = RAGPipeline()
+        pipeline.initialize(persist_directory="data/embeddings/chroma")
 
         common_questions = [
             "What is the cathode mixing ratio?",
@@ -244,6 +247,7 @@ class TestRAGQuality:
     def test_sources_are_deduplicated(self):
         """Test that sources are properly handled."""
         pipeline = RAGPipeline()
+        pipeline.initialize(persist_directory="data/embeddings/chroma")
 
         result = pipeline.query(
             question="What safety tests are required?",
