@@ -43,7 +43,7 @@ model:
 vectorstore:
   type: "chroma"
   persist_directory: "./data/embeddings/chroma"
-  collection_name: "langchain"
+  collection_name: "battery_docs"
   distance_metric: "cosine"
 
 # Data processing

@@ -108,7 +108,7 @@ Provide accurate, technical information about battery manufacturing processes, q
             chroma_client = chromadb.Client(client_settings)
             self.vectorstore = Chroma(
                 client=chroma_client,
-                collection_name=self.config.get("model", {}).get("vectorstore", {}).get("collection_name", "battery_docs"),
+                collection_name="langchain",
                 embedding_function=embedder.embeddings,
             )
         elif data_path and has_existing_store:
@@ -122,7 +122,7 @@ Provide accurate, technical information about battery manufacturing processes, q
             chroma_client = chromadb.Client(client_settings)
             self.vectorstore = Chroma(
                 client=chroma_client,
-                collection_name=self.config.get("model", {}).get("vectorstore", {}).get("collection_name", "battery_docs"),
+                collection_name="langchain",
                 embedding_function=embedder.embeddings,
             )
         elif data_path:
