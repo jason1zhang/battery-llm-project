@@ -128,9 +128,10 @@ class HybridRetriever:
         for rank, doc in enumerate(semantic_docs):
             doc_id = doc.page_content[:100]  # Use content prefix as ID
             score = 1.0 / (k + rank + 1)
-            doc_scores[doc_id] = doc_scores.get(doc_id, 0) + score * self.semantic_weight
-            if doc_id not in [d.page_content[:100] for d in doc_scores.get(doc, [])]:
-                doc_scores[doc_id] = (doc, doc_scores.get(doc_id, 0))
+            if doc_id in doc_scores:
+                doc_scores[doc_id] = (doc, doc_scores[doc_id][1] + score * self.semantic_weight)
+            else:
+                doc_scores[doc_id] = (doc, score * self.semantic_weight)
 
         # Score keyword results
         for rank, doc in enumerate(keyword_docs):

@@ -26,12 +26,18 @@ def create_gradio_interface(pipeline):
 
             answer = result.get("answer", "No answer generated")
 
-            # Filter sources
+            # Filter sources - keep top 3 by similarity
             sources = result.get("sources", [])
-            relevant_sources = [
-                src for src in sources
-                if src.get("similarity") is not None and src.get("similarity") < 1.0
-            ]
+            if sources:
+                # Sort by similarity (higher is better) and take top 3
+                sorted_sources = sorted(
+                    sources,
+                    key=lambda x: x.get("similarity", 0),
+                    reverse=True
+                )
+                relevant_sources = sorted_sources[:3]
+            else:
+                relevant_sources = []
 
             # Add sources info at the end of answer
             if relevant_sources:

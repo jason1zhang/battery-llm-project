@@ -184,19 +184,14 @@ def setup_langsmith_tracing(
         api_key: LangSmith API key
         project_name: Project name for LangSmith
     """
-    try:
-        from langchain import langsmith
+    # LangSmith tracing is enabled via environment variables
+    if api_key:
+        os.environ["LANGCHAIN_API_KEY"] = api_key
 
-        if api_key:
-            os.environ["LANGCHAIN_API_KEY"] = api_key
+    os.environ["LANGCHAIN_TRACING_V2"] = "true"
+    os.environ["LANGCHAIN_PROJECT"] = project_name
 
-        os.environ["LANGCHAIN_TRACING_V2"] = "true"
-        os.environ["LANGCHAIN_PROJECT"] = project_name
-
-        print(f"LangSmith tracing enabled for project: {project_name}")
-
-    except ImportError:
-        print("LangSmith not available. Using local tracing instead.")
+    print(f"LangSmith tracing enabled for project: {project_name}")
 
 
 def create_observability() -> LLMObservability:

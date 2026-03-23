@@ -159,7 +159,6 @@ class MiniMaxGenerator(ResponseGenerator):
                         # Skip thinking blocks or include if needed
                         pass
             return text_content if text_content else "No response generated"
-            return "No response generated"
 
         except Exception as e:
             return f"Error generating response: {str(e)}"
